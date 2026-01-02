@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: users
+
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+    username: test
+    password: test
+
