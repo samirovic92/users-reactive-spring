@@ -6,4 +6,6 @@ spring:
     url: r2dbc:h2:mem:///testdb
     username: test
     password: test
-
+  web:
+    error:
+      include-binding-errors: always
