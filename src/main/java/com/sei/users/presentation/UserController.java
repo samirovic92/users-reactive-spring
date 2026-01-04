@@ -1,8 +1,10 @@
 package com.sei.users.presentation;
 
+import com.sei.users.domain.UserService;
 import com.sei.users.presentation.request.CreateUserRequest;
 import com.sei.users.presentation.response.UserCreatedResponse;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,32 +17,21 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    private final UserService userService;
 
     @PostMapping
     public Mono<ResponseEntity<UserCreatedResponse>> createUser(@RequestBody @Valid Mono<CreateUserRequest> request) {
-        return request.map(
-                req -> new UserCreatedResponse(
-                        UUID.randomUUID(),
-                        req.firstName(),
-                        req.lastName(),
-                        req.email()
-                )
-        ).map(ResponseEntity::ok);
+        return this.userService.createUser(request)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{userId}")
-    public Mono<UserCreatedResponse> getUser(@PathVariable UUID userId) {
-        return Mono.just(
-                new UserCreatedResponse(
-                        userId,
-                        "Samic",
-                        "idrissi",
-                        "sam@gmail.com"
-                )
-        );
+    public Mono<UserCreatedResponse> getUserById(@PathVariable UUID userId) {
+        return userService.getUserById(userId);
     }
 
     @GetMapping
