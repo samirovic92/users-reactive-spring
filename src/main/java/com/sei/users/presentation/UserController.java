@@ -5,6 +5,7 @@ import com.sei.users.presentation.request.CreateUserRequest;
 import com.sei.users.presentation.response.UserCreatedResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +27,14 @@ public class UserController {
     @PostMapping
     public Mono<ResponseEntity<UserCreatedResponse>> createUser(@RequestBody @Valid Mono<CreateUserRequest> request) {
         return this.userService.createUser(request)
-                .map(ResponseEntity::ok);
+                .map(item-> ResponseEntity.status(HttpStatus.CREATED).body(item));
     }
 
     @GetMapping("/{userId}")
-    public Mono<UserCreatedResponse> getUserById(@PathVariable UUID userId) {
-        return userService.getUserById(userId);
+    public Mono<ResponseEntity<UserCreatedResponse>> getUserById(@PathVariable UUID userId) {
+        return userService.getUserById(userId)
+                .map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @GetMapping
