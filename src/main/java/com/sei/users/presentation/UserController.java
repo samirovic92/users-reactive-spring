@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,21 +39,11 @@ public class UserController {
     }
 
     @GetMapping
-    public Flux<UserCreatedResponse> getAllUsers() {
-        return Flux.just(
-                new UserCreatedResponse(
-                        UUID.randomUUID(),
-                        "samir",
-                        "idrissi",
-                        "sam@gmail.com"
-                ),
-                new UserCreatedResponse(
-                        UUID.randomUUID(),
-                        "Jhon",
-                        "Bob",
-                        "jbob@gmail.com"
-                )
-        );
+    public Flux<UserCreatedResponse> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return userService.findAllBy(page, limit);
     }
 
 }

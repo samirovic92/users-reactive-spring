@@ -6,7 +6,9 @@ import com.sei.users.presentation.request.CreateUserRequest;
 import com.sei.users.presentation.response.UserCreatedResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -25,6 +27,12 @@ public class UserService {
     public Mono<UserCreatedResponse> getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .mapNotNull(this::convertToUserResponse);
+    }
+
+    public Flux<UserCreatedResponse> findAllBy(int page, int limit) {
+        var pageable = Pageable.ofSize(limit).withPage(page);
+        return userRepository.findAllBy(pageable)
+                .map(this::convertToUserResponse);
     }
 
     private UserEntity convertToEntity(CreateUserRequest createUserRequest) {
