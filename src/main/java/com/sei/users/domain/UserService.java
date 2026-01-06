@@ -6,6 +6,7 @@ import com.sei.users.presentation.request.CreateUserRequest;
 import com.sei.users.presentation.response.UserCreatedResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -26,7 +27,8 @@ public class UserService {
 
     public Mono<UserCreatedResponse> getUserById(UUID userId) {
         return userRepository.findById(userId)
-                .mapNotNull(this::convertToUserResponse);
+                .mapNotNull(this::convertToUserResponse)
+                .onErrorMap(e -> new UserCreationException(e.getMessage()));
     }
 
     public Flux<UserCreatedResponse> findAllBy(int page, int limit) {
