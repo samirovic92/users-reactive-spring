@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Mono<UserCreatedResponse> createUser(Mono<CreateUserRequest> createUserRequest) {
         return createUserRequest.mapNotNull(this::convertToEntity)
@@ -40,6 +42,7 @@ public class UserService {
     private UserEntity convertToEntity(CreateUserRequest createUserRequest) {
         var userEntity = new UserEntity();
         BeanUtils.copyProperties(createUserRequest, userEntity);
+        userEntity.setPassword(passwordEncoder.encode(createUserRequest.password()));
         return userEntity;
     }
 
