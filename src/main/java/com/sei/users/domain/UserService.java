@@ -6,18 +6,21 @@ import com.sei.users.presentation.request.CreateUserRequest;
 import com.sei.users.presentation.response.UserCreatedResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 @AllArgsConstructor
 @Service
-public class UserService {
+public class UserService implements ReactiveUserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -37,6 +40,17 @@ public class UserService {
         var pageable = Pageable.ofSize(limit).withPage(page);
         return userRepository.findAllBy(pageable)
                 .map(this::convertToUserResponse);
+    }
+
+    @Override
+    public Mono<UserDetails> findByUsername(String username) {
+        return userRepository.findByEmail(username)
+                .map( userEntity -> User
+                        .withUsername(userEntity.getEmail())
+                        .password(userEntity.getPassword())
+                        .authorities(new ArrayList<>())
+                        .build()
+                );
     }
 
     private UserEntity convertToEntity(CreateUserRequest createUserRequest) {
