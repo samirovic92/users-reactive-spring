@@ -4,7 +4,9 @@ import com.sei.users.domain.AuthenticationService;
 import com.sei.users.presentation.request.AuthenticationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,8 @@ public class AuthenticationController {
         return authenticationRequest.flatMap(request ->
                         authenticationService.authenticate(request.username(), request.password()))
                 .map(this::buildAuthenticationRespone);
+                //.onErrorReturn(BadCredentialsException.class, ResponseEntity.status(HttpStatus.UNAUTHORIZED).build())
+                //.onErrorReturn(Exception.class, ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     private ResponseEntity<Void> buildAuthenticationRespone(Map<String, String> response) {

@@ -3,6 +3,7 @@ package com.sei.users.presentation;
 import com.sei.users.domain.UserCreationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,13 @@ public class GlobalExceptionHandler {
     public Mono<ErrorResponse> handleException(Exception exception) {
         return Mono.just(
                 ErrorResponse.builder(exception, HttpStatus.INTERNAL_SERVER_ERROR,  exception.getMessage()).build()
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public Mono<ErrorResponse> handle(BadCredentialsException exception) {
+        return Mono.just(
+                ErrorResponse.builder(exception, HttpStatus.UNAUTHORIZED,  exception.getMessage()).build()
         );
     }
 
