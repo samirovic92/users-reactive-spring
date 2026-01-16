@@ -15,6 +15,7 @@ import java.util.Map;
 public class AuthenticationService {
     private final ReactiveAuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     public Mono<Map<String, String>> authenticate(String username, String password) {
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password))
@@ -23,9 +24,10 @@ public class AuthenticationService {
     }
 
     private Map<String, String> buildAuthenticationRespone(UserEntity userEntity) {
+        var userId = userEntity.getId().toString();
         return Map.of(
-                "token", "JWT",
-                "userId", userEntity.getId().toString()
+                "token", jwtService.generateJwt(userId),
+                "userId", userId
         );
     }
 

@@ -9,3 +9,7 @@ spring:
   web:
     error:
       include-binding-errors: always
+
+
+token:
+  secret: aZ3k9Qm2P7fR0LxBtC4H8wS5yN1EJd6AVpM2Kq9u0GZ7sFhRLcW5D8T3nB4YJxE6

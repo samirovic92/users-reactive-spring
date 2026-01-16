@@ -2,6 +2,7 @@ package com.sei.users.presentation;
 
 import com.sei.users.domain.AuthenticationService;
 import com.sei.users.presentation.request.AuthenticationRequest;
+import com.sei.users.presentation.response.AuthenticationResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,19 +21,14 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public Mono<ResponseEntity<Void>> login(@RequestBody Mono<AuthenticationRequest> authenticationRequest) {
+    public Mono<ResponseEntity<AuthenticationResponse>> login(@RequestBody Mono<AuthenticationRequest> authenticationRequest) {
         return authenticationRequest.flatMap(request ->
                         authenticationService.authenticate(request.username(), request.password()))
-                .map(this::buildAuthenticationRespone);
+                .map(response -> new AuthenticationResponse(response.get("userId"), response.get("token")))
+                .map(ResponseEntity::ok);
                 //.onErrorReturn(BadCredentialsException.class, ResponseEntity.status(HttpStatus.UNAUTHORIZED).build())
                 //.onErrorReturn(Exception.class, ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
-    private ResponseEntity<Void> buildAuthenticationRespone(Map<String, String> response) {
-        return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.get("token"))
-                .header("userId", response.get("userId"))
-                .build();
-    }
 
 }
