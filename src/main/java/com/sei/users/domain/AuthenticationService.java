@@ -20,13 +20,13 @@ public class AuthenticationService {
     public Mono<Map<String, String>> authenticate(String username, String password) {
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password))
                 .then(userRepository.findByEmail(username))
-                .map(this::buildAuthenticationRespone);
+                .map(this::buildAuthenticationResponse);
     }
 
-    private Map<String, String> buildAuthenticationRespone(UserEntity userEntity) {
+    private Map<String, String> buildAuthenticationResponse(UserEntity userEntity) {
         var userId = userEntity.getId().toString();
         return Map.of(
-                "token", jwtService.generateJwt(userId),
+                "token", jwtService.generateToken(userId),
                 "userId", userId
         );
     }
